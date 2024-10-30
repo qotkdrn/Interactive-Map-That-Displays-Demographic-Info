@@ -1,23 +1,29 @@
-import React, { useEffect } from 'react';
-import { loadGoogleMapsAPI } from './googleMapsLoader';
+import React from 'react'
+import { useState } from 'react'
+import { GoogleMap, useJsApiLoader } from "@react-google-maps/api"
 
-let map;
+const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
-async function initMap() {
-  const { Map } = await google.maps.importLibrary("maps");
-  map = new Map(document.getElementById("map"), {
-    center: { lat: 37.0902, lng: -95.7129 },
-    zoom: 8,
-  });
-}
+console.log(apiKey)
 
 const Map = () => {
-  useEffect(() => {
-    loadGoogleMapsAPI();
-    window.initMap = initMap; // Set as global function for callback
-  }, []);
+  const [path, setPath] = useState([]);
+  const { isLoaded } = useJsApiLoader({
+    googleMapsApiKey: apiKey
+  });
 
-  return <div id="map"></div>;
-};
+  console.log("isLoaded:", isLoaded);
 
-export default Map;
+
+  return (
+    isLoaded 
+    ? <GoogleMap
+        mapContainerStyle = {{ width: '100%', height: '100%' }}
+        center={{ lat: 39.8283, lng: 98.5795}}
+        zoom={4}
+      ></GoogleMap>
+    : <p>Loading...</p>
+  )
+}
+
+export default Map
