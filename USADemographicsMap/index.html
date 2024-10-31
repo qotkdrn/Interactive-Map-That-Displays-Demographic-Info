@@ -7,12 +7,15 @@
     <title>USA Demo Info Map</title>
 
     <!-- Link to the CSS file for styling the map -->
-     <link rel="stylesheet" href="/src/style.css" />
+     <link rel="stylesheet" href="/src/index.css" />
   </head>
   <body>
     <!-- Root div for React rendering -->
     <div id="root"></div>
 
+    <div id="map"></div>
+
+    <script type="module" src="/src/loadGoogleMaps.jsx"></script>
     <!-- Vite will inject scripts automatically -->
     <script type="module" src="/src/main.jsx"></script>
   </body>
