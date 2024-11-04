@@ -4,7 +4,7 @@ import countiesData from './counties.json'; // Import your GeoJSON file
 const App = () => {
   const mapRef = useRef(null); // Create a reference to the map div
   let map; // Declare map outside of useEffect
-  // let infoWindow; // Declare infoWindow outside useEffect for reuse
+  let infoWindow; // Declare infoWindow outside useEffect for reuse
 
   const styles = [
     // Turn off all features except for natural and administrative labels.
@@ -57,7 +57,7 @@ const App = () => {
   useEffect(() => {
     // Define the asynchronous function to initialize the map
     async function initMap() {
-      const { Map } = await google.maps.importLibrary("maps");
+      const { Map, InfoWindow } = await google.maps.importLibrary("maps");
 
       // Initialize the map within the referenced div
       map = new Map(mapRef.current, {
@@ -74,8 +74,9 @@ const App = () => {
           strictBounds: true,
         },
       });
+
       // Initialize the InfoWindow
-      // infoWindow = new InfoWindow();
+      infoWindow = new InfoWindow();
 
       // Load and display GeoJSON data
       map.data.addGeoJson(countiesData);
@@ -94,25 +95,26 @@ const App = () => {
         map.data.revertStyle(event.feature);
       });
 
-      // // Add click event listener to open InfoWindow with county information
-      // map.data.addListener("click", (event) => {
-      //   // Get county name and demographic data from the feature's properties
-      //   // const countyName = event.feature.getProperty("NAME"); // Adjust based on your GeoJSON properties
+      // Add click event listener to open InfoWindow with county information
+      map.data.addListener("click", (event) => {
+        // Get county name and demographic data from the feature's properties
+        const countyName = event.feature.getProperty("NAME"); // Adjust based on your GeoJSON properties
+        // const demographicData = event.feature.getProperty("demographics"); // Example
 
-      //   // Set content for the InfoWindow
-      //   infoWindow.setContent(`
-      //     <div>
-      //       <h2>CountyName</h2>
-      //       <p>Population: Blank for now.</p>
-      //       <p>Median Income: Blank for now.</p>
-      //       <!-- Add more demographic information as needed -->
-      //     </div>
-      //   `);
+        // Set content for the InfoWindow
+        infoWindow.setContent(`
+          <div>
+            <h2>${countyName}</h2>
+            <p>Population: </p>
+            <p>Median Income: </p>
+            <!-- Add more demographic information as needed -->
+          </div>
+        `);
 
-      //   // Position the InfoWindow at the clicked location
-      //   infoWindow.setPosition(event.latLng);
-      //   infoWindow.open(map);
-      // });
+        // Position the InfoWindow at the clicked location
+        infoWindow.setPosition(event.latLng);
+        infoWindow.open(map);
+      });
     }
 
     initMap(); // Call the function to initialize the map
