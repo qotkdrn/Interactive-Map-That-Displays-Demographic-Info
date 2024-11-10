@@ -6,6 +6,23 @@ const App = () => {
   let map; // Declare map outside of useEffect
   let infoWindow; // Declare infoWindow outside useEffect for reuse
 
+  // Map state FIPS codes to state names
+  const stateCodeToName = {
+    "01": "Alabama", "02": "Alaska", "04": "Arizona", "05": "Arkansas",
+    "06": "California", "08": "Colorado", "09": "Connecticut", "10": "Delaware",
+    "11": "District of Columbia", "12": "Florida", "13": "Georgia", "15": "Hawaii",
+    "16": "Idaho", "17": "Illinois", "18": "Indiana", "19": "Iowa", "20": "Kansas",
+    "21": "Kentucky", "22": "Louisiana", "23": "Maine", "24": "Maryland",
+    "25": "Massachusetts", "26": "Michigan", "27": "Minnesota", "28": "Mississippi",
+    "29": "Missouri", "30": "Montana", "31": "Nebraska", "32": "Nevada",
+    "33": "New Hampshire", "34": "New Jersey", "35": "New Mexico", "36": "New York",
+    "37": "North Carolina", "38": "North Dakota", "39": "Ohio", "40": "Oklahoma",
+    "41": "Oregon", "42": "Pennsylvania", "44": "Rhode Island", "45": "South Carolina",
+    "46": "South Dakota", "47": "Tennessee", "48": "Texas", "49": "Utah",
+    "50": "Vermont", "51": "Virginia", "53": "Washington", "54": "West Virginia",
+    "55": "Wisconsin", "56": "Wyoming"
+  };
+
   const styles = [
     // Turn off all features except for natural and administrative labels.
     { elementType: "geometry", stylers: [{ visibility: "off" }] }, //terrain, roads, water
@@ -61,8 +78,8 @@ const App = () => {
 
       // Initialize the map within the referenced div
       map = new Map(mapRef.current, {
-        center: { lat: 39.8283, lng: -98.5795 },
-        zoom: 10,
+        center: { lat: 36.7783, lng: -119.4179 },
+        zoom: 7,
         styles: styles, // Apply custom styles
         restriction: { // Restrict panning to the US bounds
           latLngBounds: {
@@ -96,24 +113,53 @@ const App = () => {
       });
 
       // Add click event listener to open InfoWindow with county information
-      map.data.addListener("click", (event) => {
+      map.data.addListener("click", async (event) => {
         // Get county name and demographic data from the feature's properties
         const countyName = event.feature.getProperty("NAME"); // Adjust based on your GeoJSON properties
-        // const demographicData = event.feature.getProperty("demographics"); // Example
+        const stateCode = event.feature.getProperty("STATEFP"); // Adjust these property names as per your GeoJSON
+        const countyCode = event.feature.getProperty("COUNTYFP");
+        const stateName = stateCodeToName[stateCode] || "Unknown State";
+        const apiKey = import.meta.env.VITE_CENSUS_DATA_API_KEY;
+        const url = `https://api.census.gov/data/2022/acs/acs5?get=NAME,B02001_001E,B02001_002E,B02001_003E,B02001_004E,B02001_005E,B02001_006E,B02001_007E,B02001_008E,B19013_001E&for=county:${countyCode}&in=state:${stateCode}&key=${apiKey}`;
+        
+        try {
+          const response = await fetch(url);
+          const data = await response.json();
 
-        // Set content for the InfoWindow
-        infoWindow.setContent(`
-          <div>
-            <h2>${countyName}</h2>
-            <p>Population: </p>
-            <p>Median Income: </p>
-            <!-- Add more demographic information as needed -->
-          </div>
-        `);
+          // Extract values for each race category
+          const totalPopulation = parseInt(data[1][1]);
+          const medianIncome = data[1][9] !== null ? parseInt(data[1][9]) : "Unavailable";
+          const races = {
+            "White": (parseInt(data[1][2]) / totalPopulation * 100).toFixed(2),
+            "Black": (parseInt(data[1][3]) / totalPopulation * 100).toFixed(2),
+            "American Indian": (parseInt(data[1][4]) / totalPopulation * 100).toFixed(2),
+            "Asian": (parseInt(data[1][5]) / totalPopulation * 100).toFixed(2),
+            "Native Hawaiian": (parseInt(data[1][6]) / totalPopulation * 100).toFixed(2),
+            "Some Other Race": (parseInt(data[1][7]) / totalPopulation * 100).toFixed(2),
+            "Two or More Races": (parseInt(data[1][8]) / totalPopulation * 100).toFixed(2),
+          };
 
-        // Position the InfoWindow at the clicked location
-        infoWindow.setPosition(event.latLng);
-        infoWindow.open(map);
+          infoWindow.setContent(`
+            <div>
+              <h2>${countyName} County, ${stateName}</h2>
+              <p>Population: ${totalPopulation}</p>
+              <p>Median Income: $${medianIncome}/yr</p>
+              <h3>Racial Composition: </h3>
+              <p>White: ${races.White}%</p>
+              <p>Black: ${races.Black}%</p>
+              <p>American Indian: ${races["American Indian"]}%</p>
+              <p>Asian: ${races.Asian}%</p>
+              <p>Native Hawaiian: ${races["Native Hawaiian"]}%</p>
+              <p>Some Other Race: ${races["Some Other Race"]}%</p>
+              <p>Two or More Races: ${races["Two or More Races"]}%</p>
+            </div>
+          `);
+
+          infoWindow.setPosition(event.latLng);
+          infoWindow.open(map);
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
       });
     }
 
