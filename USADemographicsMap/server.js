@@ -29,16 +29,17 @@ mongoose.connect(process.env.MONGO_URI)
 
 // API to record a visit
 app.post('/api/visits', async (req, res) => {
-  const { token, county_id } = req.body;
+  const { token, county_id, county_name } = req.body; // Include county_name
 
-  if (!token || !county_id) {
-    return res.status(400).json({ error: 'Token and county_id are required' });
+  if (!token || !county_id || !county_name) { // Check if all required fields are provided
+    return res.status(400).json({ error: 'Token, county_id, and county_name are required' });
   }
 
   try {
     const visit = new Visit({
       token,
       county_id,
+      county_name, // Include county_name in the visit
       date: new Date(),
     });
 

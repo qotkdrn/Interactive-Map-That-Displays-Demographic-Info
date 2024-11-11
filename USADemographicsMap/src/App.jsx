@@ -1,5 +1,7 @@
 import React, { useEffect, useRef } from 'react';
+import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import countiesData from './counties.json'; // Import your GeoJSON file
+import CountiesVisited from './CountiesVisited'; // Import the new page component
 
 const App = () => {
   const mapRef = useRef(null); // Create a reference to the map div
@@ -70,16 +72,16 @@ const App = () => {
       stylers: [{ visibility: "on" }]
     }
   ];
-  const recordVisit = async (countyId) => {
+  const recordVisit = async (countyId, countyName) => {
     const token = 'abcde'; // Replace with the actual user token, if available
     const response = await fetch('http://localhost:5000/api/visits', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ token, county_id: countyId }),
+      body: JSON.stringify({ token, county_id: countyId, county_name: countyName }),
     });
-
+  
     if (response.ok) {
       const visit = await response.json();
       console.log('Visit recorded:', visit);
@@ -176,12 +178,20 @@ const App = () => {
           infoWindow.open(map);
 
           // Record the visit by sending the county ID to the backend
-          recordVisit(countyCode); // Pass countyCode to record the visit
+          recordVisit(countyCode,countyName); // Pass countyCode to record the visit
         } catch (error) {
           console.error("Error fetching data:", error);
         }
       });
     }
+
+    // localStorage(() => {})
+      // if local storage doesn't have token key, 
+      // then generate random token and save to local storage
+      // if token already exists get it from local storage
+
+    // 1. generate token: random string that represents user
+    // generate token first time user visits web page
 
     initMap(); // Call the function to initialize the map
 
@@ -194,14 +204,28 @@ const App = () => {
   }, []);
 
   return (
-    <div>
-      <h1>US Demographics</h1>
-      <div 
-        ref={mapRef} // Attach the ref to the div
-        style={{ width: '100vw', height: '100vh' }} // Full screen map
-      ></div>
-    </div>
+    <Router>
+      <div>
+        <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <h1>US Demographics</h1>
+          <Link to="/counties-visited">
+            <button>Counties Visited</button>
+          </Link>
+        </header>
+
+        <Routes>
+          <Route path="/" element={
+            <div 
+              ref={mapRef}
+              style={{ width: '100vw', height: '100vh' }}
+            ></div>
+          } />
+          <Route path="/counties-visited" element={<CountiesVisited />} />
+        </Routes>
+      </div>
+    </Router>
   );
+  
 };
 
 export default App;
