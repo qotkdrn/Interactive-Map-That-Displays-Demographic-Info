@@ -72,8 +72,17 @@ const App = () => {
       stylers: [{ visibility: "on" }]
     }
   ];
+
   const recordVisit = async (countyId, countyName) => {
-    const token = 'abcde'; // Replace with the actual user token, if available
+    // Retrieve the token from localStorage
+    const token = localStorage.getItem('token');
+
+    // Check if token exists before making the request
+    if (!token) {
+      console.error('No token found in localStorage.');
+      return;
+    }
+    
     const response = await fetch('http://localhost:5000/api/visits', {
       method: 'POST',
       headers: {
@@ -89,6 +98,23 @@ const App = () => {
       console.error('Failed to record visit');
     }
   };
+
+  // Function to generate a 13-character random token
+  const generateToken = () => {
+    return Math.random().toString(36).substring(2, 15);
+  };
+
+  // Retrieve or set token in localStorage
+  const getToken = () => {
+    let token = localStorage.getItem('token');
+    if (!token) {
+      token = generateToken();
+      localStorage.setItem('token', token);
+    }
+    return token;
+  };
+
+  const token = getToken(); // Retrieve the token here for use
 
   useEffect(() => {
     // Define the asynchronous function to initialize the map
@@ -184,7 +210,7 @@ const App = () => {
         }
       });
     }
-
+    
     // localStorage(() => {})
       // if local storage doesn't have token key, 
       // then generate random token and save to local storage
