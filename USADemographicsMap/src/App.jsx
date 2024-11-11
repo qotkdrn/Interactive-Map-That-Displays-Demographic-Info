@@ -70,6 +70,23 @@ const App = () => {
       stylers: [{ visibility: "on" }]
     }
   ];
+  const recordVisit = async (countyId) => {
+    const token = 'abcde'; // Replace with the actual user token, if available
+    const response = await fetch('http://localhost:5000/api/visits', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ token, county_id: countyId }),
+    });
+
+    if (response.ok) {
+      const visit = await response.json();
+      console.log('Visit recorded:', visit);
+    } else {
+      console.error('Failed to record visit');
+    }
+  };
 
   useEffect(() => {
     // Define the asynchronous function to initialize the map
@@ -157,6 +174,9 @@ const App = () => {
 
           infoWindow.setPosition(event.latLng);
           infoWindow.open(map);
+
+          // Record the visit by sending the county ID to the backend
+          recordVisit(countyCode); // Pass countyCode to record the visit
         } catch (error) {
           console.error("Error fetching data:", error);
         }

@@ -2,6 +2,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
+import cors from 'cors'; //Import cors
 import Visit from './models/Visit.js'; // Import the Visit model
 
 // Load environment variables
@@ -9,6 +10,14 @@ dotenv.config();
 
 // Create an Express app
 const app = express();
+
+// Enable CORS for all origins (or specify the allowed origins)
+app.use(cors()); // This will allow all origins by default
+
+// OR you can specify allowed origins
+// app.use(cors({
+//   origin: 'http://localhost:4000'  // Allow only this frontend URL
+// }));
 
 // Middleware to parse JSON request bodies
 app.use(express.json());
