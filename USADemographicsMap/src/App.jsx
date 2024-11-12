@@ -210,14 +210,6 @@ const App = () => {
         }
       });
     }
-    
-    // localStorage(() => {})
-      // if local storage doesn't have token key, 
-      // then generate random token and save to local storage
-      // if token already exists get it from local storage
-
-    // 1. generate token: random string that represents user
-    // generate token first time user visits web page
 
     initMap(); // Call the function to initialize the map
 
