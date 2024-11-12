@@ -6,10 +6,23 @@ const CountiesVisited = () => {
 
   useEffect(() => {
     async function fetchVisits() {
-      const token = 'abcde'; // Replace with actual user token
-      const response = await fetch(`http://localhost:5000/api/visits/${token}`);
-      const data = await response.json();
-      setVisits(data);
+      const token = localStorage.getItem('token'); // Retrieve the token from localStorage
+
+      if (!token) {
+        console.error("User token not found in localStorage.");
+        return;
+      }
+
+      try {
+        const response = await fetch(`http://localhost:5000/api/visits/${token}`);
+        if (!response.ok) {
+          throw new Error("Failed to fetch visited counties.");
+        }
+        const data = await response.json();
+        setVisits(data);
+      } catch (error) {
+        console.error("Error fetching visits:", error);
+      }
     }
     fetchVisits();
   }, []);
@@ -18,10 +31,7 @@ const CountiesVisited = () => {
     <div>
       <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
-          <Link to="/">
-            <button>Back</button>
-          </Link>
-          <button style={{ marginLeft: '10px' }}>Counties Visited</button>
+          <h2>Counties Visited</h2>
         </div>
       </header>
 
