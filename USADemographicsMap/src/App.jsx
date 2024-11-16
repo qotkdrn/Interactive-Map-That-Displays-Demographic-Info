@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import countiesData from './counties.json'; // Import your GeoJSON file
 import CountiesVisited from './CountiesVisited'; // Import the new page component
+import Navbar from './Navbar'
 
 const App = () => {
   const mapRef = useRef(null); // Create a reference to the map div
@@ -223,23 +224,19 @@ const App = () => {
 
   return (
     <Router>
-      <div>
-        <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h1>US Demographics</h1>
-          <Link to="/counties-visited">
-            <button>Counties Visited</button>
-          </Link>
-        </header>
-
-        <Routes>
-          <Route path="/" element={
-            <div 
-              ref={mapRef}
-              style={{ width: '100vw', height: '100vh' }}
-            ></div>
-          } />
-          <Route path="/counties-visited" element={<CountiesVisited />} />
-        </Routes>
+      <div className="flex flex-col h-screen">
+        <Navbar />
+        <div className="flex-grow">
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <div ref={mapRef} className="w-full h-full" />
+              }
+            />
+            <Route path="/counties-visited" element={<CountiesVisited />} />
+          </Routes>
+        </div>
       </div>
     </Router>
   );
