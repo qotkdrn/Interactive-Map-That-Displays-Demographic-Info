@@ -1,11 +1,13 @@
 import React, { useEffect, useRef } from 'react';
-import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, useLocation} from 'react-router-dom';
 import countiesData from './counties.json'; // Import your GeoJSON file
 import CountiesVisited from './CountiesVisited'; // Import the new page component
 import Navbar from './Navbar'
+import Footer from './Footer'
 
-const App = () => {
+const MapComponent = () => {
   const mapRef = useRef(null); // Create a reference to the map div
+  const location = useLocation();
   let map; // Declare map outside of useEffect
   let infoWindow; // Declare infoWindow outside useEffect for reuse
 
@@ -220,27 +222,26 @@ const App = () => {
         map = null; // This is not necessary, but you can keep it for clarity
       }
     };
-  }, []);
+  }, [location]);
 
+  return <div ref={mapRef} className="w-full h-full" />;
+};
+
+const App = () => {
   return (
     <Router>
       <div className="flex flex-col h-screen">
         <Navbar />
         <div className="flex-grow">
           <Routes>
-            <Route
-              path="/"
-              element={
-                <div ref={mapRef} className="w-full h-full" />
-              }
-            />
+            <Route path="/" element={<MapComponent />} />
             <Route path="/counties-visited" element={<CountiesVisited />} />
           </Routes>
         </div>
+        <Footer />
       </div>
     </Router>
   );
-  
 };
 
 export default App;
