@@ -85,8 +85,8 @@ const MapComponent = () => {
       console.error('No token found in localStorage.');
       return;
     }
-    
-    const response = await fetch('http://localhost:5000/api/visits', {
+    const POST_API_URL = process.env.REACT_APP_POST_API_URL;
+    const response = await fetch(POST_API_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

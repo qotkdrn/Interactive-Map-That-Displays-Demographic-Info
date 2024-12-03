@@ -4,6 +4,8 @@ import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import cors from 'cors'; //Import cors
 import Visit from './models/Visit.js'; // Import the Visit model
+import awsServerlessExpress from 'aws-serverless-express';
+
 
 // Load environment variables
 dotenv.config();
@@ -23,9 +25,13 @@ app.use(cors()); // This will allow all origins by default
 app.use(express.json());
 
 // Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log('Connected to MongoDB'))
-  .catch((error) => console.error('MongoDB connection error:', error));
+const uri = process.env.MONGO_URI; // Use environment variables for MongoDB URI
+mongoose.connect(uri)
+.then(() => console.log('Connected to MongoDB Atlas!'))
+.catch((error) => console.error('Error connecting to MongoDB Atlas:', error));
+
+// Create a router to define your /api/visits routes
+const visitRouter = express.Router();
 
 // API to record a visit
 app.post('/api/visits', async (req, res) => {
@@ -64,8 +70,9 @@ app.get('/api/visits/:token', async (req, res) => {
   }
 });
 
-// Start the server
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+// Wrap with aws-serverless-express
+const server = awsServerlessExpress.createServer(app);
+
+export const handler = (event, context) => {
+  awsServerlessExpress.proxy(server, event, context);
+};

@@ -19,7 +19,8 @@ const CountiesVisited = () => {
       }
 
       try {
-        const response = await fetch(`http://localhost:5000/api/visits/${token}`);
+        const GET_API_URL = process.env.REACT_APP_GET_API_URL;
+        const response = await fetch(`${GET_API_URL}/${token}`);
         if (!response.ok) {
           throw new Error("Failed to fetch visited counties.");
         }
