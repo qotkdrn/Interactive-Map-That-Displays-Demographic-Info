@@ -86,6 +86,7 @@ const MapComponent = () => {
       return;
     }
     const POST_API_URL = process.env.REACT_APP_POST_API_URL;
+    console.log(POST_API_URL);
     const response = await fetch(POST_API_URL, {
       method: 'POST',
       headers: {
