@@ -36,7 +36,9 @@ export const getVisitsHandler = async (event) => {
     };
   }
   try {
+    console.log('Establishing database connection...');
     await connectToMongoDB();
+    console.log('Database connection established.');
 
     // Extract token from pathParameters
     const { token } = event.pathParameters;

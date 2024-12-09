@@ -10,8 +10,6 @@ let isConnected = false;
 
 const connectToMongoDB = async () => {
   if (isConnected) return;
-  const uri = process.env.MONGO_URI;
-  console.log(uri);
   console.log('Attempting to connect to MongoDB...');
   try {
     await mongoose.connect(uri);
@@ -28,6 +26,7 @@ export const postVisitHandler = async (event) => {
   console.log('Lambda function invoked with event:', event); // Log event input
   const httpmethod = event.httpMethod;
   if (httpmethod == 'OPTIONS') {
+    console.log('OPTIONS request received');
     return {
       statusCode: 200,
       headers: {
