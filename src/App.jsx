@@ -85,7 +85,7 @@ const MapComponent = () => {
       console.error('No token found in localStorage.');
       return;
     }
-    const POST_API_URL = process.env.REACT_APP_POST_API_URL;
+    const POST_API_URL = import.meta.env.VITE_POST_API_URL;
     console.log(POST_API_URL);
     const response = await fetch(POST_API_URL, {
       method: 'POST',

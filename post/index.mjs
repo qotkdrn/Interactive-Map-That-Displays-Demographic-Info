@@ -26,7 +26,18 @@ const connectToMongoDB = async () => {
 // Lambda handler for POST /api/visits
 export const postVisitHandler = async (event) => {
   console.log('Lambda function invoked with event:', event); // Log event input
-
+  const httpmethod = event.httpMethod;
+  if (httpmethod == 'OPTIONS') {
+    return {
+      statusCode: 200,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type',
+      },
+      body: JSON.stringify({ message: 'CORS OK' }),
+    };
+  }
   try {
     console.log('Establishing database connection...');
     await connectToMongoDB();

@@ -23,6 +23,18 @@ const connectToMongoDB = async () => {
 
 // Lambda handler for GET /api/visits/:token
 export const getVisitsHandler = async (event) => {
+  const httpmethod = event.httpMethod;
+  if (httpmethod == 'OPTIONS') {
+    return {
+      statusCode: 200,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type',
+      },
+      body: JSON.stringify({ message: 'CORS OK' }),
+    };
+  }
   try {
     await connectToMongoDB();
 
